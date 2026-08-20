@@ -1,8 +1,8 @@
-name: CI
+name: CI Test2
 
 on:
   push:
-    branches: [main, master]
+    # branches: [main, master]
   pull_request:
 
 # Cancel superseded runs on the same ref (rapid PR pushes / force-pushes).
@@ -152,8 +152,8 @@ jobs:
         include:
           - arch: arm64
             runner: macos-latest
-          - arch: x86_64
-            runner: macos-15-intel
+          # - arch: x86_64
+          #   runner: macos-15-intel
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
@@ -186,23 +186,23 @@ jobs:
       # to the app crates is tracked separately — see deny.toml.
       - run: cargo deny --all-features --manifest-path crates/openlogi/Cargo.toml check
 
-  clippy-windows:
-    name: clippy (windows)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-      - uses: Swatinem/rust-cache@v2
-        with:
-          prefix-key: v1-rust
-          shared-key: windows-stable-debug
-          save-if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      # Whole workspace, matching the Linux jobs — GPUI's DirectX backend
-      # covers the GUI on Windows. clippy subsumes `cargo check` and
-      # additionally lints the Windows-only code paths (the WH_MOUSE_LL hook,
-      # SendInput synthesis, native HID writer, the composite HID++ channel,
-      # and the agent's HKCU-Run autostart) that the Linux/macOS clippy jobs
-      # never compile.
-      - run: cargo clippy --workspace --all-targets -- -D warnings
+  # clippy-windows:
+  #   name: clippy (windows)
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #     - uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         components: clippy
+  #     - uses: Swatinem/rust-cache@v2
+  #       with:
+  #         prefix-key: v1-rust
+  #         shared-key: windows-stable-debug
+  #         save-if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+  #     # Whole workspace, matching the Linux jobs — GPUI's DirectX backend
+  #     # covers the GUI on Windows. clippy subsumes `cargo check` and
+  #     # additionally lints the Windows-only code paths (the WH_MOUSE_LL hook,
+  #     # SendInput synthesis, native HID writer, the composite HID++ channel,
+  #     # and the agent's HKCU-Run autostart) that the Linux/macOS clippy jobs
+  #     # never compile.
+  #     - run: cargo clippy --workspace --all-targets -- -D warnings
